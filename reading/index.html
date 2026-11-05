@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#DCEFFA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+<body>
+<title>بستان الحروف</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;700;800&family=Lalezar&family=Noto+Naskh+Arabic:wght@500;700&display=swap">
+<style>
+/* Layout: one-screen toy-box app. Chunky "wooden block" tiles (thick darker bottom edge) on a sky ground; reading text set large in Naskh. Deliberately single bright theme for young children. */
+:root{
+  color-scheme: light;
+  --sky:#DCEFFA; --sky2:#C7E4F5; --paper:#FFFFFF; --ink:#22314A; --muted:#5E6F8A; --line:#C3DCEC;
+  --leaf:#2E9E6A; --leaf-d:#1F7A50; --sun:#FFB52E; --sun-d:#D98E0B;
+  --berry:#E2557B; --berry-d:#B83A5E; --ocean:#3A86D4; --ocean-d:#2763A3; --grape:#8A62D0; --grape-d:#6743A8;
+  --good:#2E9E6A; --bad:#D9483B; --hl:#FFE38A;
+  --f-display:'Lalezar','Baloo Bhaijaan 2','Segoe UI',Tahoma,sans-serif;
+  --f-ui:'Baloo Bhaijaan 2','Segoe UI',Tahoma,Arial,sans-serif;
+  --f-read:'Noto Naskh Arabic','Traditional Arabic','Times New Roman',serif;
+  --rs:1; --r:22px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-ui);font-size:17px;direction:rtl;overflow:hidden}
+button{font-family:inherit;color:inherit;cursor:pointer;border:0;background:none;-webkit-tap-highlight-color:transparent}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--ocean);outline-offset:3px}
+#app{height:100%;max-width:860px;margin:0 auto;display:flex;flex-direction:column}
+header.top{display:flex;align-items:center;gap:10px;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{font-family:var(--f-display);font-size:26px;color:var(--leaf-d);flex:1;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iconbtn{width:48px;height:48px;border-radius:16px;background:var(--paper);box-shadow:0 4px 0 var(--line);display:grid;place-items:center;font-size:22px;flex:none}
+.iconbtn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.stars{display:flex;align-items:center;gap:6px;background:var(--paper);border-radius:999px;padding:6px 14px 6px 10px;box-shadow:0 4px 0 var(--line);font-weight:800;font-size:20px;font-variant-numeric:tabular-nums}
+.stars .st{color:var(--sun);font-size:22px}
+.stars.bump{animation:bump .5s}
+@keyframes bump{40%{transform:scale(1.25)}}
+#view{flex:1;overflow-y:auto;overflow-x:hidden;padding-block:6px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));-webkit-overflow-scrolling:touch}
+h2.h{font-family:var(--f-display);font-weight:400;font-size:30px;margin:6px 0 4px;color:var(--ink);text-wrap:balance}
+p.sub{margin:0 0 16px;color:var(--muted);font-size:16px}
+
+/* toy block */
+.block{--c:var(--leaf);--d:var(--leaf-d);background:var(--c);color:#fff;border-radius:var(--r);box-shadow:0 7px 0 var(--d);transition:transform .08s,box-shadow .08s}
+.block:active{transform:translateY(5px);box-shadow:0 2px 0 var(--d)}
+.c-leaf{--c:var(--leaf);--d:var(--leaf-d)}.c-sun{--c:var(--sun);--d:var(--sun-d)}.c-berry{--c:var(--berry);--d:var(--berry-d)}.c-ocean{--c:var(--ocean);--d:var(--ocean-d)}.c-grape{--c:var(--grape);--d:var(--grape-d)}
+.btn{padding:12px 22px;font-size:20px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.btn.ghost{background:var(--paper);color:var(--ink);box-shadow:0 6px 0 var(--line)}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.row.center{justify-content:center}
+
+/* home */
+.hello{background:var(--paper);border-radius:28px;padding:18px 20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;box-shadow:0 6px 0 var(--line);margin-bottom:22px}
+.hello .txt{flex:1;min-width:200px}
+.hello h1{font-family:var(--f-display);font-weight:400;font-size:34px;margin:0;line-height:1.3;color:var(--berry-d)}
+.goal{margin-top:8px;font-size:15px;color:var(--muted)}
+.bar{height:16px;background:var(--sky);border-radius:999px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sun),var(--leaf));border-radius:999px;transition:width .6s}
+.streak{background:var(--sky);border-radius:18px;padding:10px 14px;text-align:center;min-width:92px}
+.streak b{display:block;font-size:30px;font-family:var(--f-display);font-weight:400;color:var(--sun-d);line-height:1.1}
+.streak span{font-size:13px;color:var(--muted)}
+.namebox{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.namebox input{flex:1;min-width:140px;font:inherit;font-size:18px;padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:var(--sky)}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 16px}
+.tile{text-align:right;padding:18px 18px 16px;display:flex;flex-direction:column;gap:4px;min-height:170px;position:relative;overflow:hidden}
+.tile .gl{font-family:var(--f-read);font-weight:700;font-size:46px;line-height:1.5;opacity:.95}
+.tile .tt{font-family:var(--f-display);font-weight:400;font-size:25px;line-height:1.3}
+.tile .ts{font-size:15px;opacity:.92;line-height:1.5}
+.tile .tp{position:absolute;top:14px;left:14px;background:rgba(255,255,255,.25);border-radius:999px;padding:2px 10px;font-size:14px;font-weight:800}
+.sec-title{font-family:var(--f-display);font-weight:400;font-size:24px;margin:28px 0 10px}
+.stickers{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;background:var(--paper);border-radius:24px;padding:14px;box-shadow:0 6px 0 var(--line)}
+.stk{aspect-ratio:1;max-width:100%;border-radius:16px;background:var(--sky);display:grid;place-items:center;font-size:34px}
+.stk.lock{font-size:20px;color:var(--muted);font-weight:800;opacity:.6}
+.stk.new{animation:pop .7s}
+.parents-link{display:flex;justify-content:center;margin-top:26px}
+.parents-link button{color:var(--muted);font-size:16px;font-weight:700;padding:10px 18px;border-radius:999px;background:rgba(255,255,255,.6)}
+
+/* letters */
+.lgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
+.lbtn{aspect-ratio:1;max-width:100%;background:var(--paper);border-radius:18px;box-shadow:0 5px 0 var(--line);font-family:var(--f-read);font-weight:700;font-size:clamp(26px,6vw,40px);position:relative;display:grid;place-items:center;line-height:1}
+.lbtn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--line)}
+.lbtn.done::after{content:"";position:absolute;top:7px;left:7px;width:10px;height:10px;border-radius:50%;background:var(--leaf)}
+
+/* sheet */
+.sheet-back{position:fixed;inset:0;background:rgba(34,49,74,.45);display:flex;align-items:flex-end;justify-content:center;z-index:50;animation:fade .2s}
+.sheet{background:var(--paper);width:100%;max-width:760px;max-height:92%;overflow-y:auto;border-radius:30px 30px 0 0;padding-block:18px calc(24px + env(safe-area-inset-bottom,0px));padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));animation:up .25s}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+@keyframes fade{from{opacity:0}}
+.big-letter{display:flex;align-items:center;gap:18px}
+.big-letter .L{font-family:var(--f-read);font-weight:700;font-size:96px;line-height:1.2;color:var(--berry-d);min-width:110px;text-align:center;background:var(--sky);border-radius:26px}
+.big-letter .nm{font-family:var(--f-display);font-size:30px}
+.forms{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.forms span{font-family:var(--f-read);font-size:28px;background:var(--sky);border-radius:12px;padding:0 12px;line-height:1.7}
+.forms small{display:block;font-family:var(--f-ui);font-size:11px;color:var(--muted);text-align:center;line-height:1.2;margin-bottom:4px}
+.grp{margin-top:16px}
+.grp h4{margin:0 0 8px;font-size:16px;color:var(--muted);font-weight:700}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{font-family:var(--f-read);font-weight:700;font-size:calc(34px * var(--rs));min-width:74px;padding:2px 14px;line-height:1.7;background:var(--paper);border:3px solid var(--line);border-radius:18px;box-shadow:0 4px 0 var(--line)}
+.chip:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.chip.on{background:var(--hl);border-color:var(--sun)}
+.example{display:flex;align-items:center;gap:14px;background:var(--sky);border-radius:20px;padding:10px 16px;margin-top:16px;width:100%;text-align:right}
+.example .em{font-size:52px}
+.example .wd{font-family:var(--f-read);font-weight:700;font-size:38px}
+
+/* blend */
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:8px 18px;border-radius:999px;background:var(--paper);font-weight:800;font-size:17px;box-shadow:0 4px 0 var(--line)}
+.tab.on{background:var(--ink);color:#fff;box-shadow:0 4px 0 #0f1a2b}
+.card{background:var(--paper);border-radius:30px;box-shadow:0 7px 0 var(--line);padding:22px 18px;text-align:center}
+.emo{font-size:96px;line-height:1.15;min-height:110px;display:grid;place-items:center}
+.emo.hide{filter:blur(14px) grayscale(1);opacity:.35}
+.emo.show{animation:pop .6s}
+@keyframes pop{0%{transform:scale(.4)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.syl{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.syl .chip{font-size:calc(44px * var(--rs));min-width:86px}
+.word-full{font-family:var(--f-read);font-weight:700;font-size:calc(58px * var(--rs));line-height:1.6;min-height:1.6em;color:var(--leaf-d)}
+.word-full.ghost{color:var(--line)}
+.dots{display:flex;gap:6px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.dots i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.dots i.done{background:var(--leaf)}
+.dots i.cur{background:var(--ink);transform:scale(1.3)}
+
+/* stories */
+.slist{display:grid;gap:14px}
+.sitem{display:flex;align-items:center;gap:14px;padding:14px 16px;text-align:right;width:100%}
+.sitem .si{font-size:44px;width:64px;height:64px;border-radius:18px;background:rgba(255,255,255,.25);display:grid;place-items:center;flex:none}
+.sitem .sx{flex:1;min-width:0}
+.sitem .sn{font-family:var(--f-read);font-weight:700;font-size:24px;line-height:1.5}
+.sitem .sm{font-size:14px;opacity:.92}
+.sitem .ss{font-size:20px;letter-spacing:2px;flex:none}
+.story{background:var(--paper);border-radius:28px;box-shadow:0 7px 0 var(--line);padding:22px 20px;margin:12px 0 20px}
+.story p{margin:0 0 6px;font-family:var(--f-read);font-weight:500;font-size:calc(30px * var(--rs));line-height:2.1}
+.w{border-radius:10px;padding:0 3px;cursor:pointer;transition:background .15s}
+.w.hl{background:var(--hl);box-shadow:0 0 0 3px var(--hl)}
+.story-head{display:flex;align-items:center;gap:12px}
+.story-head .em{font-size:58px}
+.story-head h2{margin:0}
+.ctrl{position:sticky;bottom:0;background:linear-gradient(transparent,var(--sky) 30%);padding-top:14px}
+
+/* quiz & games */
+.q{font-family:var(--f-read);font-weight:700;font-size:calc(30px * var(--rs));line-height:1.8;margin:6px 0 16px}
+.opts{display:grid;gap:14px}
+.opt{background:var(--paper);color:var(--ink);box-shadow:0 6px 0 var(--line);border-radius:22px;padding:10px 18px;font-family:var(--f-read);font-weight:700;font-size:calc(30px * var(--rs));line-height:1.7;min-height:72px;border:3px solid transparent}
+.opt:active{transform:translateY(4px);box-shadow:0 2px 0 var(--line)}
+.opt.ok{border-color:var(--good);background:#E3F6EC}
+.opt.no{border-color:var(--bad);background:#FCE6E3;animation:shake .4s}
+.opts.emoji{grid-template-columns:repeat(3,minmax(0,1fr))}
+.opts.emoji .opt{font-size:64px;line-height:1.3;padding:14px 6px}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.prog{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-weight:800;color:var(--muted)}
+.prog .bar{flex:1;margin:0}
+.speaker{width:110px;height:110px;border-radius:50%;font-size:50px;margin:8px auto 18px;display:grid;place-items:center}
+.feedback{min-height:36px;font-family:var(--f-display);font-size:26px;text-align:center;margin-top:14px}
+.feedback.good{color:var(--good)}.feedback.bad{color:var(--bad)}
+.slots{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0 18px;direction:rtl}
+.slot{width:74px;height:84px;border-radius:18px;border:3px dashed var(--line);background:var(--paper);font-family:var(--f-read);font-weight:700;font-size:calc(38px * var(--rs));display:grid;place-items:center}
+.slot.f{border-style:solid;border-color:var(--ocean);background:#EAF3FC}
+.slots.no{animation:shake .4s}
+.pool{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.pool .chip{min-width:74px;font-size:calc(38px * var(--rs))}
+.pool .chip.used{visibility:hidden}
+.result{text-align:center;padding:10px 0}
+.result .big{font-size:80px;line-height:1.2}
+.result h3{font-family:var(--f-display);font-weight:400;font-size:34px;margin:6px 0}
+.games{display:grid;gap:16px}
+
+/* parents */
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.stat{background:var(--paper);border-radius:20px;padding:14px;box-shadow:0 5px 0 var(--line)}
+.stat b{display:block;font-family:var(--f-display);font-weight:400;font-size:30px;color:var(--ocean-d);font-variant-numeric:tabular-nums;line-height:1.3}
+.stat span{font-size:14px;color:var(--muted)}
+.panel{background:var(--paper);border-radius:22px;padding:16px 18px;box-shadow:0 5px 0 var(--line);margin-top:16px}
+.panel h3{margin:0 0 10px;font-size:20px}
+.field{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--sky2)}
+.field:last-child{border:0}
+.field label{flex:1;min-width:150px;font-weight:700}
+.field input[type=text],.field select{font:inherit;font-size:17px;padding:8px 12px;border-radius:12px;border:2px solid var(--line);background:var(--sky);min-width:0;max-width:100%}
+.field input[type=checkbox]{width:26px;height:26px;accent-color:var(--leaf)}
+.tips{margin:0;padding-inline-start:20px;line-height:1.9;max-width:65ch}
+.missed{display:flex;gap:8px;flex-wrap:wrap}
+.missed button{font-family:var(--f-read);font-weight:700;font-size:22px;background:var(--sky);border-radius:14px;padding:2px 12px}
+.missed button small{font-family:var(--f-ui);font-size:12px;color:var(--bad);margin-inline-start:6px}
+.note{font-size:15px;color:var(--muted);line-height:1.8}
+.warn{background:#FFF4D6;border:2px solid var(--sun);border-radius:16px;padding:10px 14px;font-size:15px;line-height:1.8;margin-bottom:14px}
+
+/* gate */
+.gate{text-align:center}
+.hold{position:relative;width:150px;height:150px;border-radius:50%;margin:16px auto;background:var(--sky);font-weight:800;font-size:18px;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+.hold i{position:absolute;inset:auto 0 0 0;height:0;background:var(--leaf);opacity:.35}
+.hold.go i{height:100%;transition:height 2s linear}
+.hold span{position:relative}
+
+/* toast & confetti */
+#toast{position:fixed;left:50%;top:calc(76px + env(safe-area-inset-top,0px));transform:translate(-50%,-20px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:999px;font-weight:800;opacity:0;pointer-events:none;transition:.3s;z-index:80;max-width:calc(100% - 32px);text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.conf{position:fixed;top:-20px;width:12px;height:16px;border-radius:3px;z-index:90;pointer-events:none;animation:fall 1.8s ease-in forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+@media (max-width:560px){
+  .tiles{gap:14px 12px}
+  .tile{min-height:150px;padding:14px}
+  .tile .gl{font-size:36px}.tile .tt{font-size:21px}.tile .ts{font-size:13px}
+  .lgrid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .stickers{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .big-letter .L{font-size:76px;min-width:90px}
+  .emo{font-size:80px}
+  .slot{width:60px;height:72px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="app">
+  <header class="top">
+    <button class="iconbtn" id="homeBtn" aria-label="الرئيسية" hidden>➜</button>
+    <div class="brand" id="brand">بستان الحروف</div>
+    <div class="stars" id="stars" aria-label="النجوم"><span class="st">★</span><span id="starN">٠</span></div>
+  </header>
+  <main id="view"></main>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+/* ================= DATA ================= */
+const LETTERS=[
+ ['ا','ألف','أَرْنَبٌ','🐇'],['ب','باء','بَطَّةٌ','🦆'],['ت','تاء','تُفَّاحٌ','🍎'],['ث','ثاء','ثَعْلَبٌ','🦊'],
+ ['ج','جيم','جَمَلٌ','🐪'],['ح','حاء','حِصَانٌ','🐎'],['خ','خاء','خَرُوفٌ','🐑'],['د','دال','دُبٌّ','🐻'],
+ ['ذ','ذال','ذُرَةٌ','🌽'],['ر','راء','رِيشَةٌ','🪶'],['ز','زاي','زَرَافَةٌ','🦒'],['س','سين','سَمَكَةٌ','🐟'],
+ ['ش','شين','شَمْسٌ','☀️'],['ص','صاد','صَارُوخٌ','🚀'],['ض','ضاد','ضِفْدَعٌ','🐸'],['ط','طاء','طَائِرَةٌ','✈️'],
+ ['ظ','ظاء','ظَرْفٌ','✉️'],['ع','عين','عِنَبٌ','🍇'],['غ','غين','غَيْمَةٌ','☁️'],['ف','فاء','فِيلٌ','🐘'],
+ ['ق','قاف','قِطَّةٌ','🐱'],['ك','كاف','كُرَةٌ','⚽'],['ل','لام','لَيْمُونٌ','🍋'],['م','ميم','مَوْزٌ','🍌'],
+ ['ن','نون','نَحْلَةٌ','🐝'],['ه','هاء','هِلَالٌ','🌙'],['و','واو','وَرْدَةٌ','🌹'],['ي','ياء','يَدٌ','✋']
+];
+const NONJOIN='ادذرزو';
+const W=(s,e,l,w)=>({s:s.split(' '),e,l,w:w||s.split(' ').join('')});
+const WORDS=[
+ W('أَ سَ دٌ','🦁',1),W('قَ لَ مٌ','✏️',1),W('جَ مَ لٌ','🐪',1),W('وَ لَ دٌ','👦',1),W('قَ مَ رٌ','🌙',1),
+ W('عِ نَ بٌ','🍇',1),W('بَ صَ لٌ','🧅',1),W('مَ طَ رٌ','🌧️',1),W('كُ رَ ةٌ','⚽',1),W('سَ مَ كَ ةٌ','🐟',1),
+ W('شَ جَ رَ ةٌ','🌳',1),W('بَ قَ رَ ةٌ','🐄',1),W('يَ دٌ','✋',1),W('ذُ رَ ةٌ','🌽',1),
+ W('بَا بٌ','🚪',2),W('فِي لٌ','🐘',2),W('نَا رٌ','🔥',2),W('كِ تَا بٌ','📖',2),W('شَمْ سٌ','☀️',2),
+ W('بَيْ تٌ','🏠',2),W('مَوْ زٌ','🍌',2),W('نَحْ لَ ةٌ','🐝',2),W('وَرْ دَ ةٌ','🌹',2),W('أَرْ نَ بٌ','🐇',2),
+ W('خَ رُو فٌ','🐑',2),W('حِ صَا نٌ','🐎',2),W('غَيْ مَ ةٌ','☁️',2),W('لَيْ مُو نٌ','🍋',2),
+ W('قِطْ طَ ةٌ','🐱',3,'قِطَّةٌ'),W('سَيْ يَا رَ ةٌ','🚗',3,'سَيَّارَةٌ'),W('طَا ئِ رَ ةٌ','✈️',3),W('مِفْ تَا حٌ','🔑',3),
+ W('صَا رُو خٌ','🚀',3),W('بُرْ تُ قَا لٌ','🍊',3),W('دَرْ رَا جَ ةٌ','🚲',3,'دَرَّاجَةٌ'),W('تُفْ فَا حَ ةٌ','🍎',3,'تُفَّاحَةٌ'),
+ W('زَ رَا فَ ةٌ','🦒',3),W('ضِفْ دَ عٌ','🐸',3),W('فَ رَا شَ ةٌ','🦋',3),W('مَدْ رَ سَ ةٌ','🏫',3),
+ W('سُ لَحْ فَا ةٌ','🐢',3),W('بَطْ طَ ةٌ','🦆',3,'بَطَّةٌ')
+];
+const STORIES=[
+ {id:'cat',t:'قِطَّتِي لُولُو',e:'🐱',l:1,c:'c-berry',s:[
+  'عِنْدِي قِطَّةٌ صَغِيرَةٌ.','اسْمُهَا لُولُو.','لُولُو تُحِبُّ الْحَلِيبَ.','تَلْعَبُ لُولُو بِالْكُرَةِ.','ثُمَّ تَنَامُ عَلَى السَّرِيرِ.'],
+  q:[['مَا اسْمُ الْقِطَّةِ؟','لُولُو','مِيمِي','سُوسُو'],['مَاذَا تُحِبُّ لُولُو؟','الْحَلِيبَ','الْمَوْزَ','الْعِنَبَ'],['أَيْنَ تَنَامُ لُولُو؟','عَلَى السَّرِيرِ','فِي الْحَدِيقَةِ','تَحْتَ الشَّجَرَةِ']]},
+ {id:'garden',t:'فِي الْحَدِيقَةِ',e:'🌷',l:1,c:'c-leaf',s:[
+  'ذَهَبَتْ سَلْمَى إِلَى الْحَدِيقَةِ.','رَأَتْ وَرْدَةً حَمْرَاءَ.','وَرَأَتْ فَرَاشَةً جَمِيلَةً.','جَلَسَتْ سَلْمَى تَحْتَ الشَّجَرَةِ.','وَأَكَلَتْ تُفَّاحَةً لَذِيذَةً.'],
+  q:[['إِلَى أَيْنَ ذَهَبَتْ سَلْمَى؟','إِلَى الْحَدِيقَةِ','إِلَى الْمَدْرَسَةِ','إِلَى السُّوقِ'],['مَا لَوْنُ الْوَرْدَةِ؟','حَمْرَاءُ','زَرْقَاءُ','صَفْرَاءُ'],['مَاذَا أَكَلَتْ سَلْمَى؟','تُفَّاحَةً','مَوْزَةً','خُبْزًا']]},
+ {id:'rabbit',t:'الْأَرْنَبُ وَالْجَزَرَةُ',e:'🥕',l:2,c:'c-sun',s:[
+  'فِي الصَّبَاحِ، خَرَجَ الْأَرْنَبُ مِنْ بَيْتِهِ.','كَانَ جَائِعًا جِدًّا.','وَجَدَ جَزَرَةً كَبِيرَةً فِي الْحَقْلِ.','رَأَى صَدِيقَهُ السِّنْجَابَ حَزِينًا.','قَسَمَ الْأَرْنَبُ الْجَزَرَةَ نِصْفَيْنِ.','فَرِحَ الصَّدِيقَانِ وَأَكَلَا مَعًا.'],
+  q:[['مَاذَا وَجَدَ الْأَرْنَبُ؟','جَزَرَةً','تُفَّاحَةً','كُرَةً'],['مَنْ صَدِيقُ الْأَرْنَبِ؟','السِّنْجَابُ','الْقِطُّ','الْفِيلُ'],['مَاذَا فَعَلَ الْأَرْنَبُ بِالْجَزَرَةِ؟','قَسَمَهَا مَعَ صَدِيقِهِ','أَكَلَهَا وَحْدَهُ','رَمَاهَا']]},
+ {id:'rain',t:'يَوْمٌ مُمْطِرٌ',e:'☔',l:2,c:'c-ocean',s:[
+  'نَظَرَ عُمَرُ مِنَ النَّافِذَةِ.','كَانَتِ السَّمَاءُ مَلِيئَةً بِالْغُيُومِ.','نَزَلَ الْمَطَرُ بِغَزَارَةٍ.','لَبِسَ عُمَرُ مِعْطَفَهُ وَحِذَاءَهُ.','وَأَخَذَ مِظَلَّتَهُ الصَّفْرَاءَ.','قَفَزَ عُمَرُ فَوْقَ الْمَاءِ وَضَحِكَ.'],
+  q:[['مَاذَا رَأَى عُمَرُ فِي السَّمَاءِ؟','الْغُيُومَ','الشَّمْسَ','النُّجُومَ'],['مَا لَوْنُ مِظَلَّةِ عُمَرَ؟','صَفْرَاءُ','حَمْرَاءُ','خَضْرَاءُ'],['مَاذَا فَعَلَ عُمَرُ فِي النِّهَايَةِ؟','قَفَزَ وَضَحِكَ','نَامَ','بَكَى']]},
+ {id:'bee',t:'النَّحْلَةُ النَّشِيطَةُ',e:'🐝',l:3,c:'c-grape',s:[
+  'تَسْتَيْقِظُ النَّحْلَةُ مُبَكِّرًا كُلَّ يَوْمٍ.','تَطِيرُ مِنْ زَهْرَةٍ إِلَى زَهْرَةٍ.','تَجْمَعُ الرَّحِيقَ الْحُلْوَ.','ثُمَّ تَعُودُ إِلَى الْخَلِيَّةِ.','هُنَاكَ تَصْنَعُ الْعَسَلَ مَعَ أَخَوَاتِهَا.','الْعَسَلُ غِذَاءٌ مُفِيدٌ وَلَذِيذٌ.'],
+  q:[['مِنْ أَيْنَ تَجْمَعُ النَّحْلَةُ الرَّحِيقَ؟','مِنَ الزُّهُورِ','مِنَ الْبَحْرِ','مِنَ الْبَيْتِ'],['مَاذَا تَصْنَعُ النَّحْلَةُ؟','الْعَسَلَ','الْحَلِيبَ','الْخُبْزَ'],['أَيْنَ تَعِيشُ النَّحْلَةُ؟','فِي الْخَلِيَّةِ','فِي الْعُشِّ','فِي الْبَحْرِ']]},
+ {id:'sara',t:'سَارَةُ تُسَاعِدُ أُمَّهَا',e:'🏡',l:3,c:'c-berry',s:[
+  'اسْتَيْقَظَتْ سَارَةُ يَوْمَ الْجُمُعَةِ.','رَأَتْ أُمَّهَا تُرَتِّبُ الْبَيْتَ.','قَالَتْ سَارَةُ: أُرِيدُ أَنْ أُسَاعِدَكِ يَا أُمِّي.','رَتَّبَتْ سَارَةُ أَلْعَابَهَا وَكُتُبَهَا.','وَسَقَتِ الزَّرْعَ فِي الشُّرْفَةِ.','قَبَّلَتْهَا أُمُّهَا وَقَالَتْ: أَنْتِ بِنْتٌ رَائِعَةٌ!'],
+  q:[['مَتَى اسْتَيْقَظَتْ سَارَةُ؟','يَوْمَ الْجُمُعَةِ','يَوْمَ السَّبْتِ','فِي اللَّيْلِ'],['مَاذَا كَانَتْ تَفْعَلُ الْأُمُّ؟','تُرَتِّبُ الْبَيْتَ','تَطْبُخُ','تَنَامُ'],['أَيْنَ سَقَتْ سَارَةُ الزَّرْعَ؟','فِي الشُّرْفَةِ','فِي الْمَطْبَخِ','فِي الْمَدْرَسَةِ']]}
+];
+const STICKERS=['🐣','🦋','🐢','🐬','🦄','🦁','🐼','🦉','🐙','🦜','🐞','🦚'];
+const PRAISE=['أَحْسَنْتِ!','رَائِعَةٌ!','مُمْتَازٌ!','بَطَلَةٌ!','شَاطِرَةٌ!'];
+const LEVEL_NAMES={1:'الْمُسْتَوَى الْأَوَّلُ',2:'الْمُسْتَوَى الثَّانِي',3:'الْمُسْتَوَى الثَّالِثُ'};
+
+/* ================= STATE ================= */
+const KEY='bustan-alhuruf-v1';
+const DEF={name:'',stars:0,letters:{},words:{},stories:{},games:{correct:0,total:0,rounds:0},missed:{},
+  settings:{rate:.8,size:1,harakat:true,goal:10},today:{date:'',stars:0},streak:0,lastDay:''};
+let S;
+try{S=Object.assign({},DEF,JSON.parse(localStorage.getItem(KEY))||{});}catch(e){S=Object.assign({},DEF);}
+S.settings=Object.assign({},DEF.settings,S.settings||{});
+S.games=Object.assign({},DEF.games,S.games||{});
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+const $=s=>document.querySelector(s);
+const view=$('#view');
+const ar=n=>Number(n).toLocaleString('ar-EG');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const HARAKA=/[ً-ْٰ]/;
+const strip=s=>s.replace(/[ً-ْٰ]/g,'');
+const graphemes=w=>{const o=[];for(const ch of w){if(HARAKA.test(ch)&&o.length)o[o.length-1]+=ch;else o.push(ch);}return o;};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pick=(a,n)=>shuffle(a).slice(0,n);
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const dkey=d=>`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+function applySettings(){document.documentElement.style.setProperty('--rs',S.settings.size);}
+
+function rollDay(){
+  const t=dkey(new Date());
+  if(S.today.date!==t){S.today={date:t,stars:0};}
+}
+function addStars(n,why){
+  rollDay();
+  const t=dkey(new Date());
+  if(S.lastDay!==t){const y=new Date();y.setDate(y.getDate()-1);S.streak=(S.lastDay===dkey(y))?S.streak+1:1;S.lastDay=t;}
+  const before=Math.floor(S.stars/10);
+  const goalBefore=S.today.stars>=S.settings.goal;
+  S.stars+=n;S.today.stars+=n;save();
+  const el=$('#stars');el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');
+  $('#starN').textContent=ar(S.stars);
+  if(Math.floor(S.stars/10)>before && before<STICKERS.length){setTimeout(()=>{toast('ملصق جديد في صندوقك: '+STICKERS[before]);confetti();},700);}
+  else if(!goalBefore && S.today.stars>=S.settings.goal){setTimeout(()=>{toast('أنهيتِ هدف اليوم! أحسنتِ');confetti();},700);}
+}
+
+/* ================= SOUND ================= */
+let voice=null,voiceChecked=false;
+const hasTTS='speechSynthesis' in window;
+function pickVoice(){
+  if(!hasTTS)return;
+  const vs=speechSynthesis.getVoices();
+  if(vs.length)voiceChecked=true;
+  voice=vs.find(v=>/^ar[-_]EG/i.test(v.lang))||vs.find(v=>/^ar[-_]SA/i.test(v.lang))||vs.find(v=>/^ar/i.test(v.lang))||null;
+}
+if(hasTTS){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+let speakId=0;
+function speak(text,rate){
+  return new Promise(res=>{
+    const r=rate||S.settings.rate;
+    const clean=text.replace(/[.!؟?،:,«»"]/g,' ').trim();
+    if(!hasTTS||!clean){setTimeout(res,400);return;}
+    const my=++speakId;
+    try{speechSynthesis.cancel();}catch(e){}
+    const u=new SpeechSynthesisUtterance(clean);
+    u.lang=voice?voice.lang:'ar-SA';if(voice)u.voice=voice;u.rate=r;u.pitch=1.1;
+    let done=false;const fin=()=>{if(!done){done=true;clearTimeout(t);res(my===speakId);}};
+    u.onend=fin;u.onerror=fin;
+    const t=setTimeout(fin,1400+clean.length*220/r);
+    speechSynthesis.speak(u);
+  });
+}
+function hush(){speakId++;readToken++;if(hasTTS)try{speechSynthesis.cancel();}catch(e){}}
+let actx=null;
+function tone(f,d,type,when){
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();
+  o.type=type||'sine';o.frequency.value=f;const t=actx.currentTime+(when||0);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.25,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g).connect(actx.destination);o.start(t);o.stop(t+d+.05);}catch(e){}
+}
+const sfx={ok(){tone(660,.18,'triangle');tone(990,.28,'triangle',.12);},no(){tone(220,.25,'square');},tap(){tone(520,.07,'sine');}};
+
+/* ================= UI HELPERS ================= */
+let toastT;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600);}
+function confetti(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const cs=['var(--sun)','var(--berry)','var(--leaf)','var(--ocean)','var(--grape)'];
+  for(let i=0;i<40;i++){const c=document.createElement('i');c.className='conf';c.style.left=Math.random()*100+'vw';c.style.background=cs[i%5];c.style.animationDelay=Math.random()*.5+'s';c.style.animationDuration=(1.4+Math.random())+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),3200);}
+}
+function setHeader(title,back){
+  $('#brand').textContent=title||'بستان الحروف';
+  const hb=$('#homeBtn');hb.hidden=!back;hb.onclick=()=>{sfx.tap();go(back);};
+  $('#starN').textContent=ar(S.stars);
+}
+
+/* ================= ROUTER ================= */
+const screens={};
+function go(name,arg){hush();closeSheet();view.scrollTop=0;(screens[name]||screens.home)(arg);}
+
+/* ---------- HOME ---------- */
+screens.home=function(){
+  setHeader('بستان الحروف',null);rollDay();
+  const g=S.settings.goal,pct=Math.min(100,Math.round(S.today.stars/g*100));
+  const lettersDone=Object.keys(S.letters).length,wordsDone=Object.keys(S.words).length,storiesDone=Object.keys(S.stories).length;
+  const unlocked=Math.min(STICKERS.length,Math.floor(S.stars/10));
+  view.innerHTML=`
+  <section class="hello">
+    <div class="txt">
+      <h1>أهلًا يا ${S.name?esc(S.name):'بطلة'}!</h1>
+      ${S.name?'':`<form class="namebox" id="nameForm"><input id="nameIn" type="text" placeholder="اكتبي اسمكِ هنا" maxlength="20" aria-label="الاسم"><button class="block btn c-leaf" style="min-height:46px;font-size:17px">حفظ</button></form>`}
+      <div class="goal">هدف اليوم: ${ar(S.today.stars)} من ${ar(g)} نجوم</div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+    </div>
+    <div class="streak"><b>${ar(S.streak)}</b><span>${S.streak===1?'يوم':'أيام'} متتالية</span></div>
+  </section>
+  <div class="tiles">
+    <button class="block tile c-berry" data-go="letters"><span class="tp">${ar(lettersDone)}/${ar(28)}</span><span class="gl">أ ب ت</span><span class="tt">الحروف والحركات</span><span class="ts">اسمعي كل حرف مع الفتحة والضمة والكسرة</span></button>
+    <button class="block tile c-ocean" data-go="blend"><span class="tp">${ar(wordsDone)}/${ar(WORDS.length)}</span><span class="gl">بَا + بٌ</span><span class="tt">ركّبي الكلمة</span><span class="ts">اقرئي الكلمة مقطعًا مقطعًا</span></button>
+    <button class="block tile c-leaf" data-go="stories"><span class="tp">${ar(storiesDone)}/${ar(STORIES.length)}</span><span class="gl">قِصَّةٌ</span><span class="tt">قصص قصيرة</span><span class="ts">اقرئي معي، ثم أجيبي عن الأسئلة</span></button>
+    <button class="block tile c-sun" data-go="games"><span class="gl">؟ ✓</span><span class="tt">ألعاب القراءة</span><span class="ts">اسمعي واختاري، وطابقي، ورتّبي</span></button>
+  </div>
+  <div class="sec-title">صندوق الملصقات</div>
+  <div class="stickers">${STICKERS.map((s,i)=>i<unlocked?`<div class="stk">${s}</div>`:`<div class="stk lock" title="${ar((i+1)*10)} نجمة">${ar((i+1)*10)}★</div>`).join('')}</div>
+  <p class="note" style="margin-top:8px">كل عشر نجوم تفتح ملصقًا جديدًا.</p>
+  <div class="parents-link"><button id="pBtn">ركن الأهل</button></div>`;
+  view.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{sfx.tap();go(b.dataset.go);});
+  $('#pBtn').onclick=()=>go('gate');
+  const f=$('#nameForm');
+  if(f)f.onsubmit=e=>{e.preventDefault();const v=$('#nameIn').value.trim();if(v){S.name=v;save();speak('أَهْلًا يا '+v);go('home');}};
+};
+
+/* ---------- LETTERS ---------- */
+screens.letters=function(){
+  setHeader('الحروف والحركات','home');
+  view.innerHTML=`<h2 class="h">اختاري حرفًا</h2><p class="sub">المسي أي حرف لتسمعيه مع حركاته. النقطة الخضراء تعني أنكِ زرتِه.</p>
+  <div class="lgrid">${LETTERS.map((l,i)=>`<button class="lbtn ${S.letters[l[0]]?'done':''}" data-i="${i}" aria-label="${l[1]}">${l[0]}</button>`).join('')}</div>`;
+  view.querySelectorAll('.lbtn').forEach(b=>b.onclick=()=>openLetter(+b.dataset.i));
+};
+function letterSets(L){
+  if(L==='ا')return{short:['أَ','أُ','إِ','أْ'],madd:['آ','أُو','إِي'],tan:['أً','أٌ','أٍ']};
+  return{short:[L+'َ',L+'ُ',L+'ِ',L+'ْ'],madd:[L+'َا',L+'ُو',L+'ِي'],tan:[L+'ًا',L+'ٌ',L+'ٍ']};
+}
+function openLetter(i){
+  const [L,name,ex,em]=LETTERS[i];const st=letterSets(L);const nj=NONJOIN.includes(L);
+  const forms=nj?[['منفصل',L],['متصل','ـ'+L]]:[['أول',L+'ـ'],['وسط','ـ'+L+'ـ'],['آخر','ـ'+L]];
+  const chips=(arr,names)=>arr.map((c,k)=>`<button class="chip" data-say="${c}" title="${names[k]}">${c}</button>`).join('');
+  openSheet(`
+    <div class="big-letter"><button class="L" data-say-name="${name}">${L}</button>
+      <div><div class="nm">حرف ${name}</div><div class="forms">${forms.map(f=>`<span><small>${f[0]}</small>${f[1]}</span>`).join('')}</div></div></div>
+    <div class="grp"><h4>الحركات: فتحة، ضمة، كسرة، سكون</h4><div class="chips">${chips(st.short,['فتحة','ضمة','كسرة','سكون'])}</div></div>
+    <div class="grp"><h4>المدود: ا و ي</h4><div class="chips">${chips(st.madd,['مد بالألف','مد بالواو','مد بالياء'])}</div></div>
+    <div class="grp"><h4>التنوين</h4><div class="chips">${chips(st.tan,['تنوين فتح','تنوين ضم','تنوين كسر'])}</div></div>
+    <button class="example" data-say="${ex}"><span class="em">${em}</span><span class="wd">${ex}</span></button>
+    <div class="row center" style="margin-top:18px">
+      ${i>0?`<button class="block btn ghost" data-nav="${i-1}">الحرف السابق</button>`:''}
+      ${i<27?`<button class="block btn c-berry" data-nav="${i+1}">الحرف التالي</button>`:''}
+    </div>`);
+  const sh=$('.sheet');
+  sh.querySelector('[data-say-name]').onclick=()=>speak(name);
+  sh.querySelectorAll('[data-say]').forEach(b=>b.onclick=()=>{sh.querySelectorAll('.chip.on').forEach(x=>x.classList.remove('on'));b.classList.add('on');speak(b.dataset.say,Math.min(S.settings.rate,.8));});
+  sh.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{closeSheet();openLetter(+b.dataset.nav);});
+  speak(name);
+  if(!S.letters[L]){S.letters[L]=1;addStars(1);const lb=view.querySelector(`.lbtn[data-i="${i}"]`);if(lb)lb.classList.add('done');}
+}
+function openSheet(html){
+  closeSheet();
+  const b=document.createElement('div');b.className='sheet-back';b.id='sheetBack';
+  b.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><div class="row" style="justify-content:flex-end;margin-bottom:6px"><button class="iconbtn" id="sheetX" aria-label="إغلاق">✕</button></div>${html}</div>`;
+  b.onclick=e=>{if(e.target===b)closeSheet();};
+  document.body.appendChild(b);$('#sheetX').onclick=closeSheet;
+}
+function closeSheet(){const b=$('#sheetBack');if(b)b.remove();}
+
+/* ---------- BLEND ---------- */
+let blendLevel=1,blendIdx=0;
+screens.blend=function(){
+  setHeader('ركّبي الكلمة','home');
+  const list=WORDS.filter(w=>w.l===blendLevel);
+  if(blendIdx>=list.length)blendIdx=0;
+  const w=list[blendIdx];const seen=S.words[w.w];
+  view.innerHTML=`
+   <div class="tabs">${[1,2,3].map(l=>`<button class="tab ${l===blendLevel?'on':''}" data-l="${l}">${LEVEL_NAMES[l]}</button>`).join('')}</div>
+   <div class="card">
+     <div class="emo ${seen?'':'hide'}" id="emo">${w.e}</div>
+     <p class="sub" style="margin:4px 0 0">${seen?'اقرئي المقاطع مرة أخرى':'المسي كل مقطع بالترتيب'}</p>
+     <div class="syl" id="syl">${w.s.map((s,i)=>`<button class="chip" data-i="${i}">${s}</button>`).join('')}</div>
+     <div class="word-full ${seen?'':'ghost'}" id="wf">${w.w}</div>
+     <div class="row center" style="margin-top:8px"><button class="block btn c-ocean" id="readW" ${seen?'':'disabled'}>اقرئي الكلمة كلها</button></div>
+   </div>
+   <div class="row center" style="margin-top:18px">
+     <button class="block btn ghost" id="prevW" ${blendIdx===0?'disabled':''}>السابقة</button>
+     <button class="block btn c-leaf" id="nextW">${blendIdx===list.length-1?'من البداية':'الكلمة التالية'}</button>
+   </div>
+   <div class="dots">${list.map((x,i)=>`<i class="${i===blendIdx?'cur':S.words[x.w]?'done':''}"></i>`).join('')}</div>
+   <p class="note" style="text-align:center;margin-top:16px">نصيحة: اقرئي المقطع بصوتكِ أولًا، ثم المسيه لتسمعي إن كان صحيحًا.</p>`;
+  view.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{blendLevel=+b.dataset.l;blendIdx=0;go('blend');});
+  const tapped=new Set();
+  view.querySelectorAll('#syl .chip').forEach(b=>b.onclick=()=>{
+    b.classList.add('on');tapped.add(b.dataset.i);speak(b.textContent,Math.min(S.settings.rate,.75));
+    if(tapped.size===w.s.length){$('#readW').disabled=false;$('#wf').classList.remove('ghost');}
+  });
+  $('#readW').onclick=async()=>{
+    const e=$('#emo');e.classList.remove('hide');e.classList.add('show');
+    await speak(w.w);
+    if(!S.words[w.w]){S.words[w.w]=1;addStars(1);sfx.ok();toast(PRAISE[Math.floor(Math.random()*PRAISE.length)]);}
+  };
+  $('#prevW').onclick=()=>{blendIdx=Math.max(0,blendIdx-1);go('blend');};
+  $('#nextW').onclick=()=>{blendIdx=(blendIdx+1)%list.length;go('blend');};
+};
+
+/* ---------- STORIES ---------- */
+screens.stories=function(){
+  setHeader('قصص قصيرة','home');
+  view.innerHTML=`<h2 class="h">اختاري قصة</h2><p class="sub">ابدئي بقصص المستوى الأول، ثم انتقلي للأصعب.</p>
+  <div class="slist">${STORIES.map(s=>{const sc=S.stories[s.id];return`
+    <button class="block sitem ${s.c}" data-id="${s.id}"><span class="si">${s.e}</span>
+      <span class="sx"><span class="sn" style="display:block">${s.t}</span><span class="sm">${LEVEL_NAMES[s.l]} · ${ar(s.s.length)} جمل</span></span>
+      <span class="ss" aria-label="النتيجة">${sc!=null?'★'.repeat(sc)+'☆'.repeat(3-sc):''}</span></button>`;}).join('')}</div>`;
+  view.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{sfx.tap();go('story',b.dataset.id);});
+};
+let readToken=0;
+screens.story=function(id){
+  const st=STORIES.find(s=>s.id===id);setHeader(st.t,'stories');
+  const show=t=>S.settings.harakat?t:strip(t);
+  view.innerHTML=`
+   <div class="story-head"><span class="em">${st.e}</span><h2 class="h">${show(st.t)}</h2></div>
+   <div class="story" id="story">${st.s.map(se=>`<p>${se.split(' ').map(w=>`<span class="w" data-w="${w}">${show(w)}</span>`).join(' ')}</p>`).join('')}</div>
+   <div class="ctrl"><div class="row center">
+     <button class="block btn c-ocean" id="along">اقرئي معي</button>
+     <button class="block btn ghost" id="stop">إيقاف</button>
+     <button class="block btn c-leaf" id="done">قرأتُها! إلى الأسئلة</button>
+   </div>
+   <p class="note" style="text-align:center">المسي أي كلمة صعبة لتسمعيها. ثم اقرئي القصة بصوتكِ لوحدكِ.</p></div>`;
+  const ws=[...view.querySelectorAll('.w')];
+  const clear=()=>ws.forEach(x=>x.classList.remove('hl'));
+  ws.forEach(el=>el.onclick=async()=>{readToken++;clear();el.classList.add('hl');await speak(el.dataset.w);el.classList.remove('hl');});
+  $('#along').onclick=async()=>{
+    const my=++readToken;
+    for(const el of ws){
+      if(my!==readToken)break;
+      clear();el.classList.add('hl');el.scrollIntoView({block:'nearest',behavior:'smooth'});
+      await speak(el.dataset.w);await wait(140);
+    }
+    if(my===readToken)clear();
+  };
+  $('#stop').onclick=()=>{hush();clear();};
+  $('#done').onclick=()=>go('quiz',id);
+};
+screens.quiz=function(id){
+  const st=STORIES.find(s=>s.id===id);setHeader('أسئلة: '+strip(st.t),'stories');
+  let qi=0,score=0;
+  const render=()=>{
+    if(qi>=st.q.length){
+      const prev=S.stories[id];
+      const first=prev==null;
+      S.stories[id]=Math.max(prev||0,score);save();
+      addStars((first?2:0)+score);
+      if(score===st.q.length)confetti();
+      view.innerHTML=`<div class="card result"><div class="big">${score===3?'🏆':score===2?'🌟':'💪'}</div>
+        <h3>${score===3?'ممتاز! فهمتِ القصة كلها':score===2?'أحسنتِ! قريبة جدًا':'محاولة جميلة! لنقرأها مرة أخرى'}</h3>
+        <p class="sub" style="font-size:22px">${ar(score)} من ${ar(st.q.length)} إجابات صحيحة</p>
+        <div class="row center"><button class="block btn ghost" id="again">اقرئي القصة مرة أخرى</button><button class="block btn c-leaf" id="more">قصة أخرى</button></div></div>`;
+      $('#again').onclick=()=>go('story',id);$('#more').onclick=()=>go('stories');
+      return;
+    }
+    const [q,...opts]=st.q[qi];const correct=opts[0];
+    view.innerHTML=`<div class="prog"><span>سؤال ${ar(qi+1)} من ${ar(st.q.length)}</span><div class="bar"><i style="width:${qi/st.q.length*100}%"></i></div></div>
+     <div class="card"><div class="row center"><div class="q">${q}</div><button class="iconbtn" id="hearQ" aria-label="اسمعي السؤال">🔊</button></div>
+     <div class="opts">${shuffle(opts).map(o=>`<button class="opt" data-o="${o}">${o}</button>`).join('')}</div>
+     <div class="feedback" id="fb"></div></div>`;
+    $('#hearQ').onclick=()=>speak(q);
+    let locked=false;
+    view.querySelectorAll('.opt').forEach(b=>b.onclick=async()=>{
+      if(locked)return;
+      if(b.dataset.o===correct){locked=true;b.classList.add('ok');sfx.ok();const fb=$('#fb');fb.className='feedback good';fb.textContent=PRAISE[qi%PRAISE.length];
+        if(!b.dataset.tried)score++;await speak(correct);await wait(500);qi++;render();}
+      else{b.classList.remove('no');void b.offsetWidth;b.classList.add('no');sfx.no();view.querySelectorAll('.opt').forEach(x=>x.dataset.tried=1);const fb=$('#fb');fb.className='feedback bad';fb.textContent='حاولي مرة أخرى';}
+    });
+  };
+  render();
+};
+
+/* ---------- GAMES ---------- */
+const GAMES=[
+ {id:'listen',t:'اسمعي واختاري',d:'تسمعين كلمة، فتختارين الكلمة المكتوبة الصحيحة',g:'🔊',c:'c-ocean'},
+ {id:'picture',t:'الكلمة والصورة',d:'اقرئي الكلمة، ثم اختاري صورتها',g:'🖼️',c:'c-berry'},
+ {id:'build',t:'رتّبي الحروف',d:'رتّبي الحروف لتكوني كلمة الصورة',g:'🧩',c:'c-grape'}
+];
+let gameLevel=1;
+screens.games=function(){
+  setHeader('ألعاب القراءة','home');
+  view.innerHTML=`<div class="tabs">${[1,2,3].map(l=>`<button class="tab ${l===gameLevel?'on':''}" data-l="${l}">${LEVEL_NAMES[l]}</button>`).join('')}</div>
+  <div class="games">${GAMES.map(g=>`<button class="block sitem ${g.c}" data-g="${g.id}"><span class="si">${g.g}</span><span class="sx"><span class="sn" style="display:block;font-family:var(--f-display);font-weight:400">${g.t}</span><span class="sm">${g.d}</span></span></button>`).join('')}</div>
+  <p class="note" style="margin-top:14px">كل لعبة فيها خمسة أسئلة. كل إجابة صحيحة من أول مرة تعطيكِ نجمة.</p>`;
+  view.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{gameLevel=+b.dataset.l;go('games');});
+  view.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{sfx.tap();go('game',b.dataset.g);});
+};
+screens.game=function(type){
+  const meta=GAMES.find(g=>g.id===type);setHeader(meta.t,'games');
+  const levelPool=WORDS.filter(w=>w.l===gameLevel);
+  let pool=type==='build'?levelPool.filter(w=>graphemes(w.w).length<=6):levelPool;
+  const items=pick(pool,5);let qi=0,score=0;
+  const others=(w,n)=>pick(levelPool.filter(x=>x.w!==w.w&&x.e!==w.e),n);
+  const finish=()=>{
+    S.games.rounds++;save();if(score)addStars(score);if(score===items.length)confetti();
+    view.innerHTML=`<div class="card result"><div class="big">${score>=4?'🏆':score>=2?'🌟':'💪'}</div>
+     <h3>${score>=4?'رائع جدًا!':score>=2?'أحسنتِ!':'تدريب جميل، العبي مرة أخرى'}</h3>
+     <p class="sub" style="font-size:22px">${ar(score)} من ${ar(items.length)} من أول محاولة</p>
+     <div class="row center"><button class="block btn ghost" id="back">لعبة أخرى</button><button class="block btn c-leaf" id="again">العبي مرة أخرى</button></div></div>`;
+    $('#again').onclick=()=>go('game',type);$('#back').onclick=()=>go('games');
+  };
+  const record=(w,ok)=>{S.games.total++;if(ok)S.games.correct++;else S.missed[w.w]=(S.missed[w.w]||0)+1;save();};
+  const progress=()=>`<div class="prog"><span>${ar(qi+1)} / ${ar(items.length)}</span><div class="bar"><i style="width:${qi/items.length*100}%"></i></div></div>`;
+  const next=async(w)=>{await speak(w.w);await wait(450);qi++;qi>=items.length?finish():render();};
+  const render=()=>{
+    const w=items[qi];let first=true;
+    if(type==='listen'||type==='picture'){
+      const opts=shuffle([w,...others(w,2)]);
+      view.innerHTML=progress()+`<div class="card">
+        ${type==='listen'?`<button class="block speaker c-ocean" id="play" aria-label="اسمعي الكلمة">🔊</button><p class="sub">اسمعي، ثم اختاري الكلمة الصحيحة</p>`
+          :`<p class="sub">اقرئي الكلمة، ثم اختاري صورتها</p><div class="word-full" style="margin-bottom:10px">${w.w}</div>`}
+        <div class="opts ${type==='picture'?'emoji':''}">${opts.map(o=>`<button class="opt" data-w="${o.w}">${type==='listen'?o.w:o.e}</button>`).join('')}</div>
+        <div class="feedback" id="fb"></div></div>`;
+      if(type==='listen'){$('#play').onclick=()=>speak(w.w);setTimeout(()=>speak(w.w),300);}
+      let locked=false;
+      view.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+        if(locked)return;const fb=$('#fb');
+        if(b.dataset.w===w.w){locked=true;b.classList.add('ok');sfx.ok();if(first)score++;record(w,first);fb.className='feedback good';fb.textContent=PRAISE[Math.floor(Math.random()*PRAISE.length)];next(w);}
+        else{if(first){first=false;}b.classList.remove('no');void b.offsetWidth;b.classList.add('no');sfx.no();fb.className='feedback bad';fb.textContent=type==='listen'?'اسمعي مرة أخرى وحاولي':'اقرئي ببطء وحاولي';}
+      });
+    }else{
+      const parts=graphemes(w.w);let order=shuffle(parts.map((p,i)=>i));
+      if(parts.length>1)while(order.every((v,i)=>v===i))order=shuffle(order);
+      const filled=[];
+      view.innerHTML=progress()+`<div class="card"><div class="emo" style="min-height:0">${w.e}</div>
+        <p class="sub">رتّبي الحروف من اليمين لتكتبي اسم الصورة</p>
+        <div class="slots" id="slots">${parts.map((_,i)=>`<button class="slot" data-s="${i}" aria-label="خانة ${i+1}"></button>`).join('')}</div>
+        <div class="pool" id="pool">${order.map(i=>`<button class="chip" data-p="${i}">${parts[i]}</button>`).join('')}</div>
+        <div class="row center" style="margin-top:16px"><button class="block btn ghost" id="hint">اسمعي الكلمة</button></div>
+        <div class="feedback" id="fb"></div></div>`;
+      $('#hint').onclick=()=>{first=false;speak(w.w);};
+      const slots=[...view.querySelectorAll('.slot')];
+      const paint=()=>slots.forEach((s,i)=>{const p=filled[i];s.textContent=p!=null?parts[p]:'';s.classList.toggle('f',p!=null);});
+      view.querySelectorAll('#pool .chip').forEach(c=>c.onclick=()=>{
+        if(filled.length>=parts.length)return;sfx.tap();filled.push(+c.dataset.p);c.classList.add('used');paint();
+        speak(parts[+c.dataset.p],.75);
+        if(filled.length===parts.length){
+          const got=filled.map(i=>parts[i]).join('');const fb=$('#fb');
+          if(got===w.w){sfx.ok();if(first)score++;record(w,first);fb.className='feedback good';fb.textContent=PRAISE[Math.floor(Math.random()*PRAISE.length)]+' '+w.w;next(w);}
+          else{first=false;sfx.no();fb.className='feedback bad';fb.textContent='قريبة! جربي ترتيبًا آخر';const sl=$('#slots');sl.classList.remove('no');void sl.offsetWidth;sl.classList.add('no');
+            setTimeout(()=>{filled.length=0;paint();view.querySelectorAll('#pool .chip').forEach(x=>x.classList.remove('used'));},700);}
+        }
+      });
+      slots.forEach((s,i)=>s.onclick=()=>{if(i!==filled.length-1)return;const p=filled.pop();view.querySelector(`#pool .chip[data-p="${p}"]`).classList.remove('used');paint();});
+    }
+  };
+  render();
+};
+
+/* ---------- PARENT GATE ---------- */
+screens.gate=function(){
+  setHeader('ركن الأهل','home');
+  view.innerHTML=`<div class="card gate"><h2 class="h">هذا القسم للأهل</h2><p class="sub">اضغط مع الاستمرار على الدائرة لمدة ثانيتين للدخول.</p>
+   <button class="hold" id="hold"><i></i><span>اضغط مطوّلًا</span></button></div>`;
+  const h=$('#hold');let t;
+  const start=e=>{e.preventDefault();h.classList.add('go');t=setTimeout(()=>go('parents'),2000);};
+  const stop=()=>{h.classList.remove('go');clearTimeout(t);};
+  h.addEventListener('pointerdown',start);['pointerup','pointerleave','pointercancel'].forEach(ev=>h.addEventListener(ev,stop));
+  h.addEventListener('contextmenu',e=>e.preventDefault());
+};
+
+/* ---------- PARENTS ---------- */
+screens.parents=function(){
+  setHeader('ركن الأهل','home');
+  const g=S.games,acc=g.total?Math.round(g.correct/g.total*100):0;
+  const missed=Object.entries(S.missed).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const storiesDone=Object.keys(S.stories).length;
+  const storyAvg=storiesDone?(Object.values(S.stories).reduce((a,b)=>a+b,0)/storiesDone).toFixed(1):'—';
+  let voiceMsg;
+  if(!hasTTS)voiceMsg='<div class="warn">هذا المتصفح لا يدعم النطق الصوتي. جرّب Chrome أو Safari.</div>';
+  else if(voiceChecked&&!voice)voiceMsg=`<div class="warn"><b>لم يُعثر على صوت عربي في هذا الجهاز</b>، لذلك قد يكون النطق غير صحيح.<br>
+    أندرويد: الإعدادات ← الإدارة العامة ← تحويل النص إلى كلام ← محرك Google ← تثبيت بيانات الصوت ← العربية.<br>
+    آيفون/آيباد: الإعدادات ← تسهيلات الاستخدام ← المحتوى المنطوق ← الأصوات ← العربية (مجد أو ليلى).<br>
+    ويندوز: الإعدادات ← الوقت واللغة ← الكلام ← إضافة أصوات ← العربية.</div>`;
+  else voiceMsg=`<p class="note">الصوت المستخدم: ${voice?esc(voice.name)+' ('+esc(voice.lang)+')':'الافتراضي للجهاز'}</p>`;
+  view.innerHTML=`
+   <h2 class="h">تقدّم ${S.name?esc(S.name):'ابنتك'}</h2>
+   <div class="stats">
+     <div class="stat"><b>${ar(S.stars)}</b><span>نجمة</span></div>
+     <div class="stat"><b>${ar(S.streak)}</b><span>أيام متتالية</span></div>
+     <div class="stat"><b>${ar(Object.keys(S.letters).length)}/${ar(28)}</b><span>حرفًا تمت زيارته</span></div>
+     <div class="stat"><b>${ar(Object.keys(S.words).length)}/${ar(WORDS.length)}</b><span>كلمة ركّبتها</span></div>
+     <div class="stat"><b>${ar(storiesDone)}/${ar(STORIES.length)}</b><span>قصص · متوسط الفهم ${storyAvg==='—'?'—':ar(storyAvg)}/٣</span></div>
+     <div class="stat"><b>${g.total?ar(acc)+'٪':'—'}</b><span>دقة الألعاب (${ar(g.total)} سؤال)</span></div>
+   </div>
+   <div class="panel"><h3>كلمات تحتاج تدريبًا</h3>
+     ${missed.length?`<div class="missed">${missed.map(([w,n])=>`<button data-say="${w}">${w}<small>×${ar(n)}</small></button>`).join('')}</div><p class="note">المس الكلمة لسماعها. تدرّبا عليها معًا بالتقطيع إلى مقاطع.</p>`:'<p class="note">لا توجد كلمات صعبة حتى الآن. الكلمات التي تخطئ فيها في الألعاب ستظهر هنا.</p>'}
+   </div>
+   <div class="panel"><h3>الإعدادات</h3>
+     <div class="field"><label for="sName">اسم الطفلة</label><input type="text" id="sName" value="${esc(S.name)}" maxlength="20"></div>
+     <div class="field"><label for="sRate">سرعة القراءة الصوتية</label><select id="sRate">
+       ${[[.6,'بطيئة جدًا'],[.8,'بطيئة'],[1,'عادية']].map(([v,t])=>`<option value="${v}" ${S.settings.rate==v?'selected':''}>${t}</option>`).join('')}</select></div>
+     <div class="field"><label for="sSize">حجم خط القراءة</label><select id="sSize">
+       ${[[1,'عادي'],[1.2,'كبير'],[1.4,'كبير جدًا']].map(([v,t])=>`<option value="${v}" ${S.settings.size==v?'selected':''}>${t}</option>`).join('')}</select></div>
+     <div class="field"><label for="sGoal">هدف النجوم اليومي</label><select id="sGoal">
+       ${[5,10,15,20].map(v=>`<option value="${v}" ${S.settings.goal==v?'selected':''}>${ar(v)}</option>`).join('')}</select></div>
+     <div class="field"><label for="sHar">إظهار التشكيل في القصص<br><span class="note">أطفئه لتتدرّب ابنتك (٨ سنوات) على القراءة بلا تشكيل</span></label><input type="checkbox" id="sHar" ${S.settings.harakat?'checked':''}></div>
+     <div class="row" style="margin-top:12px"><button class="block btn c-leaf" id="test">جرّب الصوت</button></div>
+     ${voiceMsg}
+   </div>
+   <div class="panel"><h3>نصائح لجلسة قراءة ناجحة</h3>
+     <ol class="tips">
+       <li>جلسة قصيرة كل يوم (١٠ إلى ١٥ دقيقة) أفضل من جلسة طويلة مرة في الأسبوع.</li>
+       <li>ابدأ بالحروف والحركات لعمر ٦ سنوات، ثم المقاطع، ثم القصص. ابنة ٧ و٨ سنوات تقضي وقتًا أطول في القصص.</li>
+       <li>استمعا معًا لـ«اقرئي معي»، ثم اطلب منها قراءة القصة نفسها بصوتها. تكرار القصة نفسها يبني الطلاقة.</li>
+       <li>لا تقاطعها عند كل خطأ. انتظر حتى نهاية الجملة، ثم عُد إلى الكلمة وقطّعها معها.</li>
+       <li>اسألها عن القصة بكلماتها: ماذا حدث؟ ماذا كنتِ ستفعلين؟ الفهم أهم من السرعة.</li>
+       <li>امدح المجهود («قرأتِ ببطء وبتركيز») أكثر من النتيجة.</li>
+     </ol>
+   </div>
+   <div class="panel"><h3>البدء من جديد</h3><p class="note">يمسح النجوم والتقدم والملصقات من هذا الجهاز فقط.</p>
+     <div class="row" id="resetRow"><button class="block btn ghost" id="reset">مسح التقدم</button></div></div>`;
+  view.querySelectorAll('[data-say]').forEach(b=>b.onclick=()=>speak(b.dataset.say));
+  $('#sName').onchange=e=>{S.name=e.target.value.trim();save();};
+  $('#sRate').onchange=e=>{S.settings.rate=+e.target.value;save();};
+  $('#sSize').onchange=e=>{S.settings.size=+e.target.value;applySettings();save();};
+  $('#sGoal').onchange=e=>{S.settings.goal=+e.target.value;save();};
+  $('#sHar').onchange=e=>{S.settings.harakat=e.target.checked;save();};
+  $('#test').onclick=()=>speak('أَهْلًا! هَيَّا نَقْرَأُ مَعًا.').then(()=>{if(!voice&&voiceChecked)go('parents');});
+  $('#reset').onclick=()=>{$('#resetRow').innerHTML=`<span style="font-weight:700">متأكد؟ لا يمكن التراجع.</span><button class="block btn c-berry" id="yes">نعم، امسح</button><button class="block btn ghost" id="no">إلغاء</button>`;
+    $('#no').onclick=()=>go('parents');$('#yes').onclick=()=>{const keep=S.settings;S=JSON.parse(JSON.stringify(DEF));S.settings=keep;save();toast('تم مسح التقدم');go('home');};};
+};
+
+/* ================= BOOT ================= */
+applySettings();
+go('home');
+})();
+</script>
+
+</body>
+</html>
